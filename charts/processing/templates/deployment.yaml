@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "processing.fullname" . }}
+  labels:
+    {{- include "processing.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "processing.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "processing.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "processing.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: api
+              containerPort: {{ .Values.processing.api.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: api
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: api
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: PRIMER
+            value: "{{ .Values.processing.primer }}"
+          - name: CFG_FILE
+            value: "{{ .Values.processing.cfgFile }}"
+          - name: MAIN_WORKER_THREADS
+            value: "{{ .Values.processing.mainWorkerThreads }}"
+          - name: USE_CFG_WORKERS
+            value: "{{ .Values.processing.useCfgWorkers }}"
+          - name: CFG_WORKER_THREADS
+            value: "{{ .Values.processing.cfgWorkerThreads }}"
+          - name: RUST_LOG
+            value: "{{ .Values.processing.log }}"
+          - name: API_ADDRV4
+            value: "{{ .Values.processing.api.ip }}:{{ .Values.processing.api.port }}"
+          - name: API_TLS
+            value: "{{ .Values.processing.api.tls }}"
+          - name: MONGO_URI
+            value: "{{ .Values.processing.mongo.uri }}"
+          - name: MONGO_CFG_DB
+            value: "{{ .Values.processing.mongo.cfgDb }}"
+          - name: MONGO_CFG_COLL
+            value: "{{ .Values.processing.mongo.cfgColl }}"
+          - name: MONGO_USER
+            value: "{{ .Values.processing.mongo.user }}"
+          - name: MONGO_TLS
+            value: "{{ .Values.processing.mongo.tls }}"
+          {{- if .Values.processing.api.tlsServerCertSecretName }}
+          envFrom:
+          - secretRef:
+              name: {{ .Values.processing.api.tlsServerCertSecretName }}
+          {{- end }}
+          {{- if .Values.processing.api.tlsServerKeySecretName }}
+          envFrom:
+          - secretRef:
+              name: {{ .Values.processing.api.tlsServerKeySecretName }}
+          {{- end }}
+          {{- if .Values.processing.mongo.passSecretName }}
+          envFrom:
+          - secretRef:
+              name: {{ .Values.processing.mongo.passSecretName }}
+          {{- end }}
+          
+          
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
