@@ -65,13 +65,19 @@ spec:
           - name: API_TLS
             value: "{{ .Values.processing.api.tls }}"
           - name: MONGO_URI
+            {{- if .Values.processing.mongo.uri }}
             value: "{{ .Values.processing.mongo.uri }}"
+            {{- else }}
+            value: "{{ .Release.Name }}-configmongodb"
+            {{- end }}
           - name: MONGO_CFG_DB
             value: "{{ .Values.processing.mongo.cfgDb }}"
           - name: MONGO_CFG_COLL
             value: "{{ .Values.processing.mongo.cfgColl }}"
           - name: MONGO_USER
             value: "{{ .Values.processing.mongo.user }}"
+          - name: MONGO_PASSWORD
+            value: "{{ .Values.processing.mongo.password }}"
           - name: MONGO_TLS
             value: "{{ .Values.processing.mongo.tls }}"
           {{- if .Values.processing.api.tlsServerCertSecretName }}

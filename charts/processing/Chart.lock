@@ -1,0 +1,12 @@
+dependencies:
+- name: common
+  repository: https://charts.bitnami.com/bitnami
+  version: 2.2.3
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.7.2
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 13.6.7
+digest: sha256:c605558bf44199dbbb2b7be36916035fed98dcba8f2c5e363cd25399fdf30ebb
+generated: "2023-02-09T12:32:38.69992+01:00"

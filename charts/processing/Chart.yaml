@@ -21,4 +21,18 @@ version: 0.1.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "latest"
+appVersion: v0.1.0
+dependencies:
+  - name: common
+    version: 2.2.3
+    repository: https://charts.bitnami.com/bitnami
+  - name: redis
+    alias: datacacheredis
+    condition: datacacheredis.enabled
+    version: 17.7.2
+    repository: https://charts.bitnami.com/bitnami
+  - name: mongodb
+    alias: configmongodb
+    condition: configmongodb.enabled
+    version: 13.6.7
+    repository: https://charts.bitnami.com/bitnami

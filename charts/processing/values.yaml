@@ -2,14 +2,66 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Fraudaverse Processing service specific values
+processing:
+  # the service can prime it's config from a file or MongoDb. Default value
+  # boots an empty config, which does not do anything but respond to /status API requests
+  # if MONGO is set, processing uses the MongoDb values in "mongo" sub-dictionary and cfgDb and cfgColl
+  # values to find the config in the correct db/collection of the database.
+  primer: MONGO 
+  cfgFile: cfg/config.json
+  mode: API # API / BATCH from file / GRPC(not implemented yet)
+  api:
+    ip: 0.0.0.0
+    port: 3030
+    tls: 0 # "1"/"true" enables tls. Requires tlsServerCertSecretName and tlsServerKeySecretName as K8S Secrets 
+    # tlsServerCertSecretName: # K8S Secret name containing the ServerCert as ENV API_TLS_SERVER_CERT 
+    # tlsServerKeySecretName: # K8S Secret name containing the ServerCert as ENV API_TLS_SERVER_KEY
+  mongo:
+    # uri:  # if not set, it will be automated with ".Release.Name-configmongodb"
+    cfgDb: Settings
+    cfgColl: Configuration
+    user: fa
+    password: fa1234
+    tls:
+  useCfgWorkers: 0
+  mainWorkerThreads: 8
+  cfgWorkerThreads: 0
+  log: INFO
+
+# trx-cache (redis) settings
+datacacheredis:
+  enabled: yes
+  image:
+    registry: docker.io
+    pullPolicy: IfNotPresent
+    repository: redis/redis-stack-server
+    tag: "7.0.6-RC5"
+
+# mongodb for configs and transaction storage
+configmongodb:
+  enabled: yes
+  architecture: standalone
+  auth:
+    usernames:
+      - fa
+    passwords:
+      - fa1234
+    databases:
+      - admin
+  persistence:
+    enabled: false # true
+
 replicaCount: 2
 
 image:
   repository: 560924052112.dkr.ecr.us-east-1.amazonaws.com/processing
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: v0.1.0
 
+# e.g.
+# kubectl create secret docker-registry fraudaverse-ecr --docker-server=560924052112.dkr.ecr.us-east-1.amazonaws.com --docker-username=AWS --docker-password=$(aws ecr get-login-password --region us-east-1) --namespace=default
 imagePullSecrets:
   - name: fraudaverse-ecr
 nameOverride: ""
@@ -81,26 +133,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-# Fraudaverse Processing specific values
-processing:
-  primer: FILE # MONGO/FILE, defines if config is primed from mongo or file
-  cfgFile: cfg.empty.json
-  mode: API # API / BATCH / GRPC(not implemented yet)
-  api:
-    ip: 0.0.0.0
-    port: 3030
-    tls: 0
-    # tlsServerCertSecretName: # K8S Secret name containing the ServerCert as ENV API_TLS_SERVER_CERT 
-    # tlsServerKeySecretName: # K8S Secret name containing the ServerCert as ENV API_TLS_SERVER_KEY
-  mongo:
-    uri:
-    cfgDb:
-    cfgColl:
-    user:
-    # passSecretName: # Secret name containing the kubernetes password as ENV MONGO_PASSWORD
-    tls:
-  useCfgWorkers: 0
-  mainWorkerThreads: 8
-  cfgWorkerThreads: 0
-  log: INFO
