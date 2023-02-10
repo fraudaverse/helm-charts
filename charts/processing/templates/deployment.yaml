@@ -48,55 +48,10 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          - name: PRIMER
-            value: "{{ .Values.processing.primer }}"
-          - name: CFG_FILE
-            value: "{{ .Values.processing.cfgFile }}"
-          - name: MAIN_WORKER_THREADS
-            value: "{{ .Values.processing.mainWorkerThreads }}"
-          - name: USE_CFG_WORKERS
-            value: "{{ .Values.processing.useCfgWorkers }}"
-          - name: CFG_WORKER_THREADS
-            value: "{{ .Values.processing.cfgWorkerThreads }}"
-          - name: RUST_LOG
-            value: "{{ .Values.processing.log }}"
-          - name: API_ADDRV4
-            value: "{{ .Values.processing.api.ip }}:{{ .Values.processing.api.port }}"
-          - name: API_TLS
-            value: "{{ .Values.processing.api.tls }}"
-          - name: MONGO_URI
-            {{- if .Values.processing.mongo.uri }}
-            value: "{{ .Values.processing.mongo.uri }}"
-            {{- else }}
-            value: "{{ .Release.Name }}-configmongodb"
-            {{- end }}
-          - name: MONGO_CFG_DB
-            value: "{{ .Values.processing.mongo.cfgDb }}"
-          - name: MONGO_CFG_COLL
-            value: "{{ .Values.processing.mongo.cfgColl }}"
-          - name: MONGO_USER
-            value: "{{ .Values.processing.mongo.user }}"
-          - name: MONGO_PASSWORD
-            value: "{{ .Values.processing.mongo.password }}"
-          - name: MONGO_TLS
-            value: "{{ .Values.processing.mongo.tls }}"
-          {{- if .Values.processing.api.tlsServerCertSecretName }}
-          envFrom:
-          - secretRef:
-              name: {{ .Values.processing.api.tlsServerCertSecretName }}
-          {{- end }}
-          {{- if .Values.processing.api.tlsServerKeySecretName }}
-          envFrom:
-          - secretRef:
-              name: {{ .Values.processing.api.tlsServerKeySecretName }}
-          {{- end }}
-          {{- if .Values.processing.mongo.passSecretName }}
-          envFrom:
-          - secretRef:
-              name: {{ .Values.processing.mongo.passSecretName }}
-          {{- end }}
-          
-          
+            {{- range $key, $value := .Values.processing.Envs }}
+            - name: {{ $key }}
+              value: {{ tpl (toString $value) $ | quote }}
+            {{- end }}        
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

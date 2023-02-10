@@ -27,12 +27,12 @@ dependencies:
     version: 2.2.3
     repository: https://charts.bitnami.com/bitnami
   - name: redis
-    alias: datacacheredis
-    condition: datacacheredis.enabled
+    alias: redis-trx
+    condition: redis-trx.enabled
     version: 17.7.2
     repository: https://charts.bitnami.com/bitnami
   - name: mongodb
-    alias: configmongodb
-    condition: configmongodb.enabled
+    alias: mongo-cfg-trx
+    condition: mongo-cfg-trx.enabled
     version: 13.6.7
     repository: https://charts.bitnami.com/bitnami
