@@ -28,9 +28,11 @@ serviceAccount:
 
 podAnnotations: {}
 
+# security context for processing pod
 podSecurityContext: {}
   # fsGroup: 2000
 
+# security Context for processing containers
 securityContext: {}
   # capabilities:
   #   drop:
@@ -39,6 +41,7 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+# HTTP Port exposed by the processing containers
 service:
   type: ClusterIP
   port: 80
@@ -97,7 +100,7 @@ processing:
   api:
     # ip where application exposes HTTP
     ip: 0.0.0.0
-    # HTTP Port
+    # HTTP Port used inside of the processing container
     port: 80
     tls: 0 # not supported yet
   Envs:
@@ -148,11 +151,56 @@ redis-trx:
     pullPolicy: IfNotPresent
     repository: redis/redis-stack-server # TODO: not working yet
     tag: "7.0.6-RC5"
+  master:
+    containerPorts:
+      # port used by redis inside of the container
+      redis: 6379
+    service:
+      ports:
+        # port exposed by the redis k8s-service
+        redis: 6379
+    podSecurityContext:
+      enabled: true
+      fsgroup: 1001
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+  replica:
+    containerPorts:
+      # port used by redis inside of the container
+      redis: 6379
+    service:
+      ports:
+        # port exposed by the redis k8s-service
+        redis: 6379
+    podSecurityContext:
+      enabled: false # true
+      fsgroup: 1001
+    containerSecurityContext:
+      enabled: false # true
+      runAsUser: 1001
 
 # mongodb for configs and transaction storage
 mongo-cfg-trx:
   enabled: yes
   architecture: standalone
+  # mongodb container port
+  containerPorts:
+    mongodb: 27017
+  service:
+    ports:
+      # mongodb exposing service port
+      mongodb: 27017
+  # mongo pod security context
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+    sysctls: []
+  # mongo container security context
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+    runAsNonRoot: true
   auth:
     enabled: false # TODO
   persistence:
