@@ -29,11 +29,14 @@ serviceAccount:
 podAnnotations: {}
 
 # security context for processing pod
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext: 
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
 
 # security Context for processing containers
-securityContext: {}
+securityContext:
+  allowPrivilegeEscalation: false
   # capabilities:
   #   drop:
   #   - ALL
@@ -44,7 +47,7 @@ securityContext: {}
 # HTTP Port exposed by the processing containers
 service:
   type: ClusterIP
-  port: 80
+  port: 13100
 
 ingress:
   enabled: false
@@ -101,7 +104,7 @@ processing:
     # ip where application exposes HTTP
     ip: 0.0.0.0
     # HTTP Port used inside of the processing container
-    port: 80
+    port: 13100
     tls: 0 # not supported yet
   Envs:
     # PRIMER=MONGO suggests the service to either load the config from MONGO_ prefixed environment vars
@@ -154,17 +157,19 @@ redis-trx:
   master:
     containerPorts:
       # port used by redis inside of the container
-      redis: 6379
+      redis: 13350
     service:
       ports:
         # port exposed by the redis k8s-service
-        redis: 6379
+        redis: 13350
     podSecurityContext:
-      enabled: true
-      fsgroup: 1001
+      enabled: true 
+      runAsUser: 1000
+      runAsGroup: 3000
+      fsGroup: 2000
     containerSecurityContext:
       enabled: true
-      runAsUser: 1001
+      allowPrivilegeEscalation: false
   replica:
     containerPorts:
       # port used by redis inside of the container
@@ -174,11 +179,13 @@ redis-trx:
         # port exposed by the redis k8s-service
         redis: 6379
     podSecurityContext:
-      enabled: false # true
-      fsgroup: 1001
+      enabled: true 
+      runAsUser: 1000
+      runAsGroup: 3000
+      fsGroup: 2000
     containerSecurityContext:
-      enabled: false # true
-      runAsUser: 1001
+      enabled: true
+      allowPrivilegeEscalation: false
 
 # mongodb for configs and transaction storage
 mongo-cfg-trx:
@@ -186,21 +193,21 @@ mongo-cfg-trx:
   architecture: standalone
   # mongodb container port
   containerPorts:
-    mongodb: 27017
+    mongodb: 13250
   service:
     ports:
       # mongodb exposing service port
-      mongodb: 27017
+      mongodb: 13250
   # mongo pod security context
   podSecurityContext:
-    enabled: true
-    fsGroup: 1001
-    sysctls: []
+    enabled: true 
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
   # mongo container security context
   containerSecurityContext:
     enabled: true
-    runAsUser: 1001
-    runAsNonRoot: true
+    allowPrivilegeEscalation: false
   auth:
     enabled: false # TODO
   persistence:
