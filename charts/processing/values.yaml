@@ -259,7 +259,10 @@ mongo-cfg-trx:
                   "sla": {
                       "timeout": 200,
                       "standbyExecution": [
-                          "Timeout = true"
+                          {
+                              "output": "Timeout",
+                              "expression": "true"
+                          }
                       ]
                   },
                   "records": {
@@ -318,7 +321,10 @@ mongo-cfg-trx:
                   "sla": {
                       "timeout": 200,
                       "standbyExecution": [
-                          "Timeout = true"
+                          {
+                              "output": "Timeout",
+                              "expression": "true"
+                          }
                       ]
                   },
                   "records": {
@@ -394,7 +400,7 @@ mongo-cfg-trx:
                   "timeout": 5
               }
           ],
-          "simulationSettings":{
+          "simulationSettings": {
               "period": {
                   "from": 0,
                   "to": 0,
