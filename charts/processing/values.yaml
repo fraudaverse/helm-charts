@@ -170,6 +170,9 @@ redis-trx:
     containerSecurityContext:
       enabled: true
       allowPrivilegeEscalation: false
+    configuration: | 
+      loadmodule /opt/redis-stack/lib/redistimeseries.so
+
   replica:
     containerPorts:
       # port used by redis inside of the container
@@ -186,6 +189,8 @@ redis-trx:
     containerSecurityContext:
       enabled: true
       allowPrivilegeEscalation: false
+    configuration: | 
+      loadmodule /opt/redis-stack/lib/redistimeseries.so
 
 # mongodb for configs and transaction storage
 mongo-cfg-trx:
