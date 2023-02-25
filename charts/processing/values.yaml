@@ -7,8 +7,6 @@ replicaCount: 2
 image:
   repository: 560924052112.dkr.ecr.us-east-1.amazonaws.com/processing
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: v0.1.0
 
 # e.g.
 # kubectl create secret docker-registry fraudaverse-ecr --docker-server=560924052112.dkr.ecr.us-east-1.amazonaws.com --docker-username=AWS --docker-password=$(aws ecr get-login-password --region us-east-1) --namespace=default
@@ -170,8 +168,8 @@ redis-trx:
     containerSecurityContext:
       enabled: true
       allowPrivilegeEscalation: false
-    configuration: | 
-      loadmodule /opt/redis-stack/lib/redistimeseries.so
+    extraFlags:
+      - "--loadmodule /opt/redis-stack/lib/redistimeseries.so ${REDISTIMESERIES_ARGS}"
 
   replica:
     containerPorts:
@@ -189,8 +187,8 @@ redis-trx:
     containerSecurityContext:
       enabled: true
       allowPrivilegeEscalation: false
-    configuration: | 
-      loadmodule /opt/redis-stack/lib/redistimeseries.so
+    extraFlags:
+      - "--loadmodule /opt/redis-stack/lib/redistimeseries.so ${REDISTIMESERIES_ARGS}"
 
 # mongodb for configs and transaction storage
 mongo-cfg-trx:
