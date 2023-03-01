@@ -8,3 +8,4 @@
 - RuleSets were not maintaining internal state of values (e.g. Rule 1 increases Score and Rule 2 Decreases Score, the prior increase will be ignored).
 - maxValues are now working for Distinct Values when using Redis
 - key namings in redis fixed, there was a bug for the `:` placements.
+- "database" and "collection" field for mongo datastores now support envinroment variable expansion
