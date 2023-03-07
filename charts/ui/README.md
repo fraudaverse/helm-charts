@@ -13,6 +13,23 @@
     - `AWS_USER_POOL_CLIENT_ID` - Please create a client ID token in "App client" in the user pool
 
 
+## Ingress Settings
+
+The ingress settings are very important for the Ui to be usable. There are two deployments/services involved
+
+a) ui-backend
+b) ui-frontend
+
+the http paths mappings should be the following:
+
+`/api/investigation` maps to ui-backend on it's defined port in `service.portbackend`
+
+`/admin` maps to ui-backend on it's defined port in `service.portbackend`
+
+`/` maps to ui-frontend on it's defined port in `service.portfrontend`
+
+This is already predefined in values.yaml, but please make sure that you set the correct `host` variable as well as ingress class.
+
 ## Description
 tbd
 
