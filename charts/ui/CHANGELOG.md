@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.0.5 (backend and frontend)
+
+### Changed
+
+- Various fixes of findings during deployment
 ## v0.0.4
 
 ### Changed
