@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.1.8 (processing v.0.1.8)
+
+### Added
+
+* `timestamp_to_isostr` function to convert a unix timestamp into a DateTime string in ISO3339 format
+* Group Compute supports `computeMode: Loop`. This computeMode additionally requires a key called `loopSettings`, which is an object. You can find an example in Documentation.
+* `MongoUpdate` **Compute**: A compute which is able to run Updates on a MongoDB Datastore. Example in Documentation.
+* `MongoQuery` **Compute**: A compute which is able to run queries on MongoDB Datastore. Example in Documentation.
+* `DataFieldOperation` **Compute**: A compute which is able to effectively Create and **Delete** fields during computation. Also, there is an operation called `ObjectInsert` which can insert Values into an Object by Path or Value.
+* Handlebars Notation: For some String fields in the configuration in processing, you can use handlebars notation to insert values from the current Message context, before processing will actually use the field. One example is the MongoQuery `query` and `replace` fields. `"query": "{\"Amount\": {{trx.amt}},\"Account\": {{trx.acc}}}"` will substitute `{{trx.acc}}` and `{{trx.amt}}` with the fitting values from the current Message. Currently, the following fields are supported:
+    * MongoQuery: query field
+    * MongoUpdate: query, update, replace
+    * DataFieldOperation: Create.createPath, ObjectInsert.objectPath, ObjectInsert.insertValuePath
+
+### Changed
+
+* For more clarity about what they do, the following functions were renamed:
+  * `date_parse_from_str` to `date_str_to_timestamp`
+  * `datetime_parse_from_str` to `datetime_str_to_timestamp`
+  * `datetime_ms_parse_from_str` to `datetime_str_to_timestamp_ms`
+  * `date_ms_parse_from_str` to `date_str_to_timestamp_ms`
+
+### Fixed
+
+* System Timestamp available in Presets.
+* In assignments arrays, Presets, Formulas, Rulesets, prior outputs are now available in the next assignment in the array. This has been fixed.
+* Special Values support nested json objects
+* If a preset fails, message computation is not aborted
+
 ## v0.1.7 (processing v0.1.7)
 
 ### Changed
