@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.7 (backend and frontend)
+
+### Added
+
+- Case actions on close codes
+
 ## v0.0.5 (backend and frontend)
 
 ### Changed
