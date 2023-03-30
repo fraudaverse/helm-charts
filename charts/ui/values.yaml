@@ -113,7 +113,6 @@ backend:
     DB_INV_HOST: "mongodb://{{- .Release.Name }}-mongodb:13250" # mongodb:// string for the provided mongodb
     DB_INV_NAME: investigation
     ELASTIC_INV_HOST: "http://{{- .Release.Name }}-elasticsearch:9200" # elasticsearch API string
-    ALERT_PIPELINE_URL: "https://{{- .Release.Name }}:8000/api/investigation/test/invoke"
     AWS_ACCESS_KEY_ID: # aws access key
     AWS_SECRET_ACCESS_KEY: # aws access key secret
     AWS_REGION: # AWS region
