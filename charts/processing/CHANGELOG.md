@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.1.11 (processing v0.1.11)
+
+### Added
+
+* Defined risk lists now support multiple same values with different conditions and validity periods
+
+## v0.1.10 (processing v0.1.10)
+
+### Changed
+
+* The "debug" field in pipelines is not available anymore. Instead, please use the environment variable `PIPELINE_DEBUG=1`
+
+### Fixed
+
+* Pipeline References in Async Stages are working now
+
+## v0.1.9 (processing v0.1.9)
+
+### Added
+
+* Added a logmessage for message timeouts on loglevel `WARN`
+* Added logmessages for starting computation on computes and stages, loglevel `DEBUG`
+* Json Serializer for Handlebars: if you used handlebar syntax `My Object: {{some.key}}` and some.key was a object, it was converted to a string `My Object: [object]`. You can now serialize to json representation by using `json` helper with `My Object: {{json some.key}}`. This would be serialized to a string in json format: `My Object: {"inner_key_of_some_key": 5}`. Keep in mind, this will also add quotes to the serialization of a String. This means that `\"{{mystring}}\"` is equal to `{{json mystring}}`
+
+### Changed
+
+* On Timeout, the Response will contain **latencies** and **SystemTimestamp** as well as all computes that have been successfully computed until timeout 
+
+### Fixed
+
+* `computeLatenciesMicros` for stages included the microseconds of prior stages, so the user had to calculate the difference. This has been fixed and the values represent the time for each single stage.
 ## v0.1.8 (processing v.0.1.8)
 
 ### Added
