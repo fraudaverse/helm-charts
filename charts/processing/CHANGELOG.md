@@ -1,12 +1,12 @@
 # Changelog
 
-## v0.1.11 (processing v0.1.11)
+## v0.2.0
 
 ### Added
 
 * Defined risk lists now support multiple same values with different conditions and validity periods
 
-## v0.1.10 (processing v0.1.10)
+## v0.1.10
 
 ### Changed
 
