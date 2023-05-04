@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.0
+
+### Added
+
+* Support for JWT Based Authorization (which means support for keycloak). Please consider FraudAverse Documentation Chapter 4.2.1 "JSON Web Token".
+
+### Changed
+
+* Defining Auth in backend container changed. You can set the environment Variable `AUTH_METHOD` now to `DEMO` (demo/admin/super)-users or `BEARER`, which means JWT Based Authorization.
+* For backend, the ENV variable `AUTH_IAM=False` is not functional anymore. This is now default behaviour and is equal to `AUTH_METHOD=DEMO`
+
 ## v0.1.0
 
 ### Added
