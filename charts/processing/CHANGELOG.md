@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.2.2
+
+### Changed
+- Updated Rust to Toolchain version 1.69
+- When connection settings in MongoDB URI Strings or Datastore Definitions are not specified, default values are used. The following values are default:
+  - maxPoolSize=5 
+  - minPoolSize=5 (in datastores json definition, we only define 'poolsize' because we recommend to set a fixed one)
+  - maxIdleTime=0
+  - heartrateFreq=360000
+  - directConnection=true
+  - retryWrites=false
+
+### Fixed
+- When using MongoDB URI Connection Strings (`mongodb://...`), poolsizes from JSON definitions in datastores have not been evaluated also, default application connection settings have not been set. This is the case now. The priority of values set are 'MongoDB Connection String' > 'Datastores JSON' > 'Default Values'
+- [https://fraudaverse.freshdesk.com/a/tickets/15](Freshdesk Ticket #15): When using `precalculateMessageId` together with an `inputDataField` of a MongoInsert compute, the id was recalculated and did not match the precalculated one. For this, another Option `messageIdDataField` has been introduced on Pipeline level, which should be the same value as the `inputDataField` of the relevant MongoInsert compute.
+- [https://fraudaverse.freshdesk.com/a/tickets/33](Freshdesk Ticket #33): In an assignment set (e.g. conclusions, presets), when using the output of a prior assignment as an input in the next assignment, it was not evaluated correctly. This has been fixed.
+
+## v0.2.1
+
+### Changed
+
+* Debug output for mongo inserts is single line now
+* Added debug outputs for defined risk list timing statistics
+
 ## v0.2.0
 
 ### Added
