@@ -1,5 +1,12 @@
 # Changelog
+## v0.2.3
+### Changed
 
+- directConnections default value is "false" now.
+- When connecting via "mongodb://"-string without username/password, you can still specify them as "username" and "password" fields in the datastore JSON representation
+### Fixes
+
+- Defined Risk Lists were not evaluating correctly for string types. This has been fixed.
 ## v0.2.2
 
 ### Changed
