@@ -1,4 +1,17 @@
 # Changelog
+
+## v0.2.4
+
+### Changed
+
+- The Environment Variables `USE_CFG_WORKER` and `CFG_WORKER_THREADS` are not functional anymore. Instead, if a pipeline is supposed to use it's own worker threads, you can specify `"threads": 16` accordingly to `asyncThreads` value in the pipelines JSON to define 16 seperate worker threads for a specific pipeline. If you do not specify this key, the pipeline will not have any seperate worker threads. If threads is <= 0, processing will fail to start.
+
+### Fixes
+
+- A default connectTimeout for MongoDB of 5ms caused the MongoDB driver to constantly reconnect and cause latency spikes. This has been set back to drivers default value 10000.
+- Default Values for MongoDB Client have changed back to libraries defaults: connectTimeoutMS=10000, heartrateFreqMS=10000, directConnection=false, retryWrites=true
+- The fix for [https://fraudaverse.freshdesk.com/a/tickets/33](Freshdesk Ticket #33) in v0.2.2 caused performance issues, it has been rolled back. This implies that in an array of assignments in presets, conclusions etc. the output of a prior assignment is not available in the following assignment as an input.
+
 ## v0.2.3
 ### Changed
 
