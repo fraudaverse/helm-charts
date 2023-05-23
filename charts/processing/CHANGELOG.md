@@ -4,7 +4,7 @@
 
 ### Changed
 
-- The Environment Variables `USE_CFG_WORKER` and `CFG_WORKER_THREADS` are not functional anymore. Instead, if a pipeline is supposed to use it's own worker threads, you can specify `"threads": 16` accordingly to `asyncThreads` value in the pipelines JSON to define 16 seperate worker threads for a specific pipeline. If you do not specify this key, the pipeline will not have any seperate worker threads. If threads is <= 0, processing will fail to start.
+- The Environment Variables `USE_CFG_WORKER` and `CFG_WORKER_THREADS` are not functional anymore. Instead, if a pipeline is supposed to use it's own worker threads, you can specify `"threads": 16` accordingly to `asyncThreads` value in the pipelines JSON to define 16 seperate worker threads for a specific pipeline. If you do not specify this key, the pipeline will not have any seperate worker threads. If threads is <= 0, processing will not use any seperate runtime for this pipeline.
 
 ### Fixes
 
