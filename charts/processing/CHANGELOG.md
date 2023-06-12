@@ -1,5 +1,12 @@
 # Changelog
 
+
+## v0.3.1 [2023-06-12] HOTFIX
+
+### Fixed
+- on high load, the new tracing logging mechanism can produce redundant traces including different traceIds. This has been fixed
+
+
 ## v0.3.0 [2023-06-12]
 
 ### Added
