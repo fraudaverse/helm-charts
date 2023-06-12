@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.3.0 [2023-06-12]
+
+### Added
+
+- The behaviour on SLAs has been redesigned. Instead of a single `timeout` value which immediately interrupts the message computation and returns the result "until timout", there are two timeouts.
+  - `timeout` will NOT interrupt the message computation, but it will return early from computation with the results "until timeout", including the SLAs. The message computation instead will still continue. A log on level WARN will be written.
+  - `hardTimeout` will interrupt message computation immediately and write an log on level ERROR. With the boolean option `"hardTimeoutPrintMessage": true`, processing will write state of the message "until timeout" to the log. Please make sure that you will not write sensitive data to the log if you use this option
+- `traceidDataField` has been introduced on pipeline level to define a DataField where a traceId is transmitted with the message. This traceId will be used to be shown in the logs to identify log entries with specific messages. If no traceidDataField is set, the MongoDB ObjectID of the record will be used.
+- Logs now contain information about the current pipeline (pipelineName), stage (stageName) and compute (computeName), as well as a traceId.
+- `output` Fields in Rule-Conclusions, Presets, Formulas etc. now support nested values with dot-notation. This means that `"output": "Response.SomeNumeric"` is equal to the combination of `outputDataField: "Response" / output: "SomeNumeric"`. Please keep this in mind, because `outputDataField: "Response" / output: "Response.SomeNumeric"` would write the value to `Response.Response.SomeNumeric`.
+- function `timestamp_with_nanos_to_isostr(seconds, nanos)` has been added to get a ISO Datetime string from seconds-based UNIX-timestamp together with nanoseconds value.
+- function `timestamp_ms_to_isostr` has been added to get a ISO Datetime string from a milliseconds UNIX-Timestamp.
+- function `str_replace(source, from, to)` has been added to provide a replace function which can be used in assignments. `str_replace("ym string", "ym", "my") => "my string"`
+- function `str_trim(source)` has been added to provide a trim function which can be used in assignments. `str_trim(" aa   ") => "aa"`
+
+### Fixed
+- A fix for [https://fraudaverse.freshdesk.com/a/tickets/33](Freshdesk Ticket #33) has been implemented. In Rule-Conclusions, Presets, Formulas etc, outputs of prior assignments are now available in the expression fields of the next assignments. Please keep in mind that you have to give the full path. This means that if a Ruleset has the `outputDataField: "Response"` and the assignment `output: "SomeNumeric"`, in the expression of the next assignment you have to reference it by `"expression": "Response.SomeNumeric + 1000"`.
+
+
 ## v0.2.4
 
 ### Changed
