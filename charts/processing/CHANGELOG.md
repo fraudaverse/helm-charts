@@ -1,5 +1,68 @@
 # Changelog
 
+## v0.4.0 [2023-06-27]
+
+### Changes
+
+#### Connection Pools
+`poolsize` **values in MongoDB and Redis are shared over all pipelines again. Please make sure that you increase the poolsizes to a reasonable value for the Amount of Pipelines and the load you have.** This has been changed to be in better control of the amount of connections that processing is creating to the databases.
+
+#### Logging
+Logging and Tracing has been changed. Logging and tracing can now be setup seperately. Logging is used to log system events, which do not have any hierarchical or temporal relation to each other. Tracing is used to trace a message through the system using hierarchical and temporal structures. Tracing can also connect to external systems such as Jaeger or OpenTelemetry (e.g. Elastic APM). If no `TRACER` is set, and `LOG_LEVEL` is set to "DEBUG" or "TRACE, traces will be printed to the log output. The following ENV Variables have been renamed: 
+
+```ini
+TRACER=...
+# split into (see below)
+LOGGER=... and 
+TRACER=...
+
+RUST_LOG=...
+# renamed to
+LOG_LEVEL=...
+```
+
+This means the follwing are now available:
+
+```ini
+# controls the log print output type
+LOGGER=COMPACT # COMPACT is standard. ALternatives: "PRETTY" or "JSON"
+# controls the log print level of LOGGER
+LOG_LEVEL=INFO # or "TRACE" or "DEBUG" or "WARN" or "ERROR"
+
+# controls the tracing output
+TRACER=LOG # or "JAEGER" or "OTLP"
+# controls trace level of TRACER
+TRACE_LEVEL=DEBUG
+
+# in case of OLTP use the following ENV vars to connect to the right collector
+# more here: https://opentelemetry.io/docs/concepts/sdk-configuration/otlp-exporter-configuration/
+
+OTEL_RESOURCE_ATTRIBUTES=service.name=processing
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:8200
+
+# in case you want to use Elastic APM, you use TRACER=OTLP, and:
+OTEL_RESOURCE_ATTRIBUTES=service.name=processing
+OTEL_EXPORTER_OTLP_ENDPOINT=https://apm_server_url:8200
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer an_apm_secret_token"
+OTEL_METRICS_EXPORTER="otlp"
+OTEL_LOGS_EXPORTER="otlp"
+# (taken from: https://www.elastic.co/guide/en/apm/guide/current/open-telemetry-direct.html#instrument-apps-otel)
+
+# in case of JAEGER, more: https://opentelemetry-python.readthedocs.io/en/latest/exporter/jaeger/jaeger.html 
+OTEL_EXPORTER_JAEGER_USER=...
+OTEL_EXPORTER_JAEGER_PASSWORD=...
+OTEL_EXPORTER_JAEGER_ENDPOINT=...
+OTEL_EXPORTER_JAEGER_AGENT_PORT=...
+OTEL_EXPORTER_JAEGER_AGENT_HOST=...
+OTEL_EXPORTER_JAEGER_AGENT_SPLIT_OVERSIZED_BATCHES=...
+OTEL_EXPORTER_JAEGER_TIMEOUT=...
+```
+
+### Fixed
+- In logs, the printed pre-calculated ObjectID of a Message for Mongo was wrong.
+- Freshdesk #28: In case a Assignment fails, the following assignments will still be computed (important for Formulas, Presets and Rule Conclusions)
+- Freshdesk #34: disabled Rules will not be evaluated anymore 
+
 
 ## v0.3.1 [2023-06-12] HOTFIX
 
