@@ -2,11 +2,8 @@ dependencies:
 - name: common
   repository: https://charts.bitnami.com/bitnami
   version: 2.2.3
-- name: elasticsearch
-  repository: https://charts.bitnami.com/bitnami
-  version: 19.5.14
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami
   version: 13.6.7
-digest: sha256:1c70eefd78fca46bf0101f9eb8e60cfb189899e36dcd78a8ae258673692ca7bf
-generated: "2023-03-06T14:30:52.156952+01:00"
+digest: sha256:0db24b6bda350293f0f9932381f5e4c755a72621c2f1bae1c749c78565a18509
+generated: "2023-07-11T20:04:47.92371+02:00"

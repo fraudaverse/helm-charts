@@ -16,4 +16,5 @@ spec:
       protocol: TCP
       name: httpfrontend
   selector:
+    fraudaverse-app/name: {{ include "ui.fullname" . }}-backend
     {{- include "ui.selectorLabels" . | nindent 4 }}

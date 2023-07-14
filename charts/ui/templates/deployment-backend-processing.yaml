@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ui.fullname" . }}-backend
+  name: {{ include "ui.fullname" . }}-backendproc
   labels:
     {{- include "ui.labels" . | nindent 4 }}
+
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -18,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        fraudaverse-app/name: {{ include "ui.fullname" . }}-backend
+        fraudaverse-app/name: {{ include "ui.fullname" . }}-backendproc
         {{- include "ui.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -29,31 +30,32 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}-backend
+        - name: {{ .Chart.Name }}-backendproc
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repositoryBackend }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          # image: "{{ .Values.image.repositoryBackendProc }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repositoryBackendProc }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: httpbackend
-              containerPort: {{ .Values.service.portbackend }}
+            - name: httpbackendproc
+              containerPort: 8081 
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /admin
-          #     port: httpbackend
-          #   initialDelaySeconds: 120
-          #   periodSeconds: 30
-          # readinessProbe:
-          #   httpGet:
-          #     path: /admin
-          #     port: httpbackend
-          #   initialDelaySeconds: 120
-          #   periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: httpbackendproc
+            initialDelaySeconds: 120
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: httpbackendproc
+            initialDelaySeconds: 120
+            periodSeconds: 20
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            {{- range $key, $value := .Values.backend.Envs }}
+            {{- range $key, $value := .Values.backendProc.Envs }}
             - name: {{ $key }}
               value: {{ tpl (toString $value) $ | quote }}
             {{- end }} 

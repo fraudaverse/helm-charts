@@ -18,6 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
+        fraudaverse-app/name: {{ include "ui.fullname" . }}-frontend
         {{- include "ui.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -37,14 +38,18 @@ spec:
             - name: httpfrontend
               containerPort: {{ .Values.service.portfrontend }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: httpfrontend
-          readinessProbe:
-            httpGet:
-              path: /
-              port: httpfrontend
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: httpfrontend
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 30
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: httpfrontend
+          #   initialDelaySeconds: 120
+          #   periodSeconds: 30
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
