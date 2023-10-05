@@ -1,0 +1,23 @@
+apiVersion: v2
+name: fraudaverse
+description: fraudaverse example template for a full installation including processing, ui and databases
+
+type: application
+
+version: 0.4.7
+
+appVersion: v0.4.7
+dependencies:
+  - name: common
+    version: 2.2.3
+    repository: https://charts.bitnami.com/bitnami
+  - name: redis
+    alias: redis-trx
+    condition: redis-trx.enabled
+    version: 17.7.2
+    repository: file://../redis-stack
+  - name: mongodb
+    alias: mongo-cfg-trx
+    condition: mongo-cfg-trx.enabled
+    version: 13.6.7
+    repository: https://charts.bitnami.com/bitnami
