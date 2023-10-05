@@ -27,10 +27,25 @@ spec:
       serviceAccountName: {{ include "processing.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- toYaml .Values.processing.extraVolumes | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            {{- toYaml .Values.processing.extraVolumeMounts | nindent 12 }}
+          {{- if .Values.processing.command }}
+          command: 
+            {{- toYaml .Values.processing.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.processing.args }}
+          args: 
+            {{- toYaml .Values.processing.args | nindent 12 }}
+          {{- end }}
+          {{- if .Values.processing.workingDir }}
+          workingDir: {{ .Values.processing.workingDir }}
+          {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:

@@ -94,6 +94,20 @@ affinity: {}
 
 # Fraudaverse processing-service specific values
 processing:
+  extraVolumes:
+    - name: cfg-volume
+      secret:
+        secretName: configs
+  extraVolumeMounts:
+    - name: cfg-volume
+      readOnly: true
+      mountPath: /usr/src/processing/ext_cfg
+  command:
+    - "/bin/sh"
+    - "-c"
+  args:
+    - "./processing -e ext_cfg/.env.rhaibench"
+  workingDir: "/usr/src/processing"
   # the service can prime it's config from a file or MongoDb. Default value
   # boots an empty config, which does not do anything but respond to /status API requests
   # if MONGO is set, processing uses the MongoDb values in "mongo" sub-dictionary and cfgDb and cfgColl
@@ -105,41 +119,7 @@ processing:
     port: 13100
     tls: 0 # not supported yet
   Envs:
-    # PRIMER=MONGO suggests the service to either load the config from MONGO_ prefixed environment vars
-    # or from PRIMER=FILE, which is the file mounted at CFG_FILE then
-    PRIMER: "MONGO"
-    CFG_FILE: "/processing/cfg/config.json"
-    # Processing supports API and BATCH mode
-    MODE: API
-    # Main Runtime threads available (shared by HTTP server and processing)
-    MAIN_WORKER_THREADS: 8
-    # Set to 1 if you want processing to use a different threadpool than http servers
-    USE_CFG_WORKERS: 0
-    # Size of potential threadpool for processing workers
-    CFG_WORKER_THREADS: 0
-    # Address of the API (please changes values above)
-    API_ADDRV4: "{{ .Values.processing.api.ip }}:{{ .Values.processing.api.port }}"
-    # API TLS
-    API_TLS: 0
-    # dns-name:port of mongodb for configuration priming
-    MONGO_URI: "{{- .Release.Name }}-mongo-cfg-trx:27017"
-    # Database name where the config is stored
-    MONGO_CFG_DB: FA_Configuration
-    # Collection, where the config is stored
-    MONGO_CFG_COLL: Configuration
-    #MONGO_USER: 
-    #MONGO_PASSWORD:
-    #MONGO_TLS:
-    # This is specific to the processing configuration below. The Datastore in the array "datastores" called "Payments"
-    # is instructed to connect the the database address provided in env "TRX_MONGO_IP_PORT"
-    # This datastore stores the calculated transactions
-    TRX_MONGO_IP_PORT: "{{- .Release.Name }}-mongo-cfg-trx:27017"
-    # This is specific to the processing configuration below. The Datastore in the array "datastores" called "RedisCache"
-    # is instructed to connect the the database address provided in env "REDIS_CACHE_IP_PORT"
-    # This 
-    REDIS_CACHE_IP_PORT: "redis://{{- .Release.Name }}-redis-trx-master:6379"
-    # Log level of processing: DEBUG/INFO/WARN/ERROR
-    RUST_LOG: "WARN"
+    LOG_LEVEL: INFO
 
 
 # trx-cache for realtime data
