@@ -9,15 +9,17 @@ version: 0.4.7
 appVersion: v0.4.7
 dependencies:
   - name: common
-    version: 2.2.3
+    version: 2.13.2
     repository: https://charts.bitnami.com/bitnami
   - name: redis
-    alias: redis-trx
-    condition: redis-trx.enabled
-    version: 17.7.2
-    repository: file://../redis-stack
-  - name: mongodb
-    alias: mongo-cfg-trx
-    condition: mongo-cfg-trx.enabled
-    version: 13.6.7
+    version: 18.1.0
     repository: https://charts.bitnami.com/bitnami
+  - name: mongodb
+    version: 14.0.5
+    repository: https://charts.bitnami.com/bitnami
+  - name: processing
+    version: 0.7.0
+    repository: file://../processing
+  - name: ui
+    version: 0.7.0
+    repository: file://../ui

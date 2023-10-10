@@ -1,0 +1,230 @@
+mongodb:
+  enabled: yes
+  architecture: standalone
+  # mongodb container port
+  containerPorts:
+    mongodb: 13250
+  service:
+    ports:
+      # mongodb exposing service port
+      mongodb: 13250
+  # mongo pod security context
+  podSecurityContext:
+    enabled: true 
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+  # mongo container security context
+  containerSecurityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+  auth:
+    enabled: false # TODO
+  persistence:
+    enabled: false # TODO
+  initdbScripts:
+    01-dbs-users-init.js: |
+      console.log("deploying config database FA_Configuration");
+      db = new Mongo().getDB("FA_Configuration");
+      db.createCollection('Configuration', {capped: false});
+      console.log("deploying message database FA_Messages");
+      db = new Mongo().getDB("FA_Messages");
+      db.createCollection('_', {capped: false});
+    02-load-predefined-json.sh: |
+      mongoimport --db FA_Configuration --collection Configuration --type json --file /docker-entrypoint-initdb.d/fa_config.json
+    fa_config.json: |
+      {
+          "version": "0.1",
+          "masterSettings": {
+              "name": "Minimal Default Config",
+              "description": "This is a minimal Fraudaverse config responding on /status, /pipeline and /account.",
+              "deployment": {
+                  "timestamp": "2023-01-01 00:00:00",
+                  "user": "John Doe"
+              },
+              "analyticsDatastores": {
+                  "production": "",
+                  "simulation": ""
+              },
+              "infinity": {
+                  "plus": 1000,
+                  "minus": -1000.0
+              },
+              "tls": {
+                  "clientCert": "MY_CLIENT_CERT",
+                  "clientKey": "MY_CLIENT_KEY",
+                  "clientKeyPassword": "MY_CLIENT_KEY_PASSWORD"
+              },
+              "systemTimestamp": {
+                  "serialization": "ms",
+                  "key": "SystemTimestamp"
+              }
+          },
+          "pipelines": [
+              {
+                  "name": "Amount Aggregation",
+                  "uri": "amount",
+                  "description": "This pipeline is accessible under /amount and aggregates the daily average of 'Amount' input values for 'Account' input values.",
+                  "presets": [],
+                  "sla": {
+                      "timeout": 200,
+                      "standbyExecution": [
+                          {
+                              "output": "Timeout",
+                              "expression": "true"
+                          }
+                      ]
+                  },
+                  "records": {
+                      "store": true,
+                      "datastore": {
+                          "database": "Payments",
+                          "key": "timestamp",
+                          "sharding": "daily"
+                      }
+                  },
+                  "elements": {
+                      "request": [],
+                      "stages": [
+                          {
+                              "name": "Stage 1 - Aggregate Amount",
+                              "comment": "Aggregate Amount for Account",
+                              "computes": [
+                                  {
+                                      "enabled": true,
+                                      "name": "Aggregate Daily Amount",
+                                      "comment": "A TimeAggregate aggregating Daily Amount for Account in the last 30 days before trx timestamp",
+                                      "compute": "TimeAggregate",
+                                      "raw": true,
+                                      "datastore": {
+                                          "database": "RedisCache",
+                                          "key": "account_amount_daily"
+                                      },
+                                      "entity": "Account",
+                                      "amount": "Amount",
+                                      "calculateFeatures": true,
+                                      "update": true,
+                                      "process": true,
+                                      "includeCurrent": true,
+                                      "features": [
+                                          {
+                                              "name": "AccountDailyAverage30d",
+                                              "comment": "",
+                                              "calculate": "Avg",
+                                              "from": 30,
+                                              "to": 0,
+                                              "unit": "Days"
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                      ],
+                      "response": []
+                  }
+              },
+              {
+                  "name": "Account Name",
+                  "uri": "account",
+                  "description": "This pipeline is accessible under /account and stores an AccountName if 'SetName == true' in input trx",
+                  "presets": [],
+                  "sla": {
+                      "timeout": 200,
+                      "standbyExecution": [
+                          {
+                              "output": "Timeout",
+                              "expression": "true"
+                          }
+                      ]
+                  },
+                  "records": {
+                      "store": false,
+                      "datastore": {
+                          "database": "",
+                          "key": "",
+                          "sharding": ""
+                      }
+                  },
+                  "elements": {
+                      "request": [],
+                      "stages": [
+                          {
+                              "name": "Stage 1 - Account Masterdata",
+                              "comment": "Stores account Masterdata when SetName == true in input. Otherwise output of Masterdata",
+                              "computes": [
+                                  {
+                                      "enabled": true,
+                                      "name": "Account Name",
+                                      "comment": "A single value stored in database",
+                                      "compute": "StoredValue",
+                                      "datastore": {
+                                          "database": "RedisCache",
+                                          "key": "account_name"
+                                      },
+                                      "entity": "Account",
+                                      "includeCurrent": true,
+                                      "overwrite": "SetName == true",
+                                      "calculateFeatures": [
+                                          "1==1"
+                                      ],
+                                      "update": true,
+                                      "process": true,
+                                      "features": [
+                                          {
+                                              "name": "AccountName",
+                                              "reference": "Name",
+                                              "calculate": "Value"
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                      ],
+                      "response": []
+                  }
+              }
+          ],
+          "datastores": [
+              {
+                  "provider": "MongoDB",
+                  "name": "Payments",
+                  "url": "${TRX_MONGO_IP_PORT}",
+                  "username": "",
+                  "password": "",
+                  "timeout": 5,
+                  "database": "FA_Messages",
+                  "collection": "Messages",
+                  "poolsize": 30,
+                  "tls": false,
+                  "tls_ca_path": "",
+                  "tls_cert_key_file": "",
+                  "tls_allow_invalid_hostnames": false,
+                  "tls_allow_invalid_certificates": false
+              },
+              {
+                  "provider": "Redis",
+                  "name": "RedisCache",
+                  "url": "${REDIS_CACHE_IP_PORT}",
+                  "key_prefix": "fa:",
+                  "poolsize": 500,
+                  "timeout": 5
+              }
+          ],
+          "simulationSettings": {
+              "period": {
+                  "from": 0,
+                  "to": 0,
+                  "reference": "Relative"
+              },
+              "datastore": "",
+              "ruleOptimization": {
+                  "enabled": false,
+                  "minimumHitRate": 0,
+                  "minimumFalsePositives": 0,
+                  "benefitWeight": 0,
+                  "maximumNumberOfOptimizationProposals": 0,
+                  "minimalSignificantBenefitDeleteRule": 0
+              }
+          }
+      }
+

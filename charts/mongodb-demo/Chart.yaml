@@ -1,0 +1,11 @@
+apiVersion: v2
+name: mongodb-demo
+description: MongoDB with prefilled demo data for FraudAverse
+type: application
+version: 0.7.0
+
+dependencies:
+  - name: mongodb
+    condition: mongo-cfg-trx.enabled
+    version: 14.0.5
+    repository: https://charts.bitnami.com/bitnami

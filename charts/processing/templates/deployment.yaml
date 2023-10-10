@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "processing.fullname" . }}
+  name: {{ include "fullname" . }}
   labels:
-    {{- include "processing.labels" . | nindent 4 }}
+    {{- include "labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "processing.selectorLabels" . | nindent 6 }}
+      {{- include "selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,39 +18,39 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "processing.selectorLabels" . | nindent 8 }}
+        {{- include "selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "processing.serviceAccountName" . }}
+      serviceAccountName: {{ include "serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        {{- toYaml .Values.processing.extraVolumes | nindent 8 }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           volumeMounts:
-            {{- toYaml .Values.processing.extraVolumeMounts | nindent 12 }}
-          {{- if .Values.processing.command }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- if .Values.command }}
           command: 
-            {{- toYaml .Values.processing.command | nindent 12 }}
+            {{- toYaml .Values.command | nindent 12 }}
           {{- end }}
-          {{- if .Values.processing.args }}
+          {{- if .Values.args }}
           args: 
-            {{- toYaml .Values.processing.args | nindent 12 }}
+            {{- toYaml .Values.args | nindent 12 }}
           {{- end }}
-          {{- if .Values.processing.workingDir }}
-          workingDir: {{ .Values.processing.workingDir }}
+          {{- if .Values.workingDir }}
+          workingDir: {{ .Values.workingDir }}
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: api
-              containerPort: {{ .Values.processing.api.port }}
+              containerPort: {{ .Values.api.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -63,10 +63,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            {{- range $key, $value := .Values.processing.Envs }}
+            {{- range $key, $value := .Values.Envs }}
             - name: {{ $key }}
               value: {{ tpl (toString $value) $ | quote }}
             {{- end }}        
+            - name: API_ADDRV4
+              value: {{ .Values.api.ip }}:{{ .Values.api.port }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

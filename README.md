@@ -87,3 +87,51 @@ and rerun the `kubectl create ...` command.
 ### Start the charts
 
 To start the charts, please refer to [Install processing and UI](#install-processing-and-ui). You can leave out the namespace part to use namespace `default`.
+
+
+## Dependency graph
+
+Fraudaverse Helm Charts consists of 4 Repos:
+
+- **ui** is the ui service chart
+- **processing** is the processings service chart
+- **redis-stack** is a fork of the bitnami redis chart with enabled redis-stack functionality
+- **fraudaverse** is a whole-application deployment and combines dependencies to processing, ui, redis stack and mongodb. **fraudaverse** does not have exclusive own services 
+
+**mongodb** is a dependency to the bitnami mongodb chart. 
+
+```
+Fraudaverse Charts
+┌──────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│                                                                  │
+│                                                                  │
+│  ┌──────────┐                ┌────┐             ┌─────────────┐  │
+│  │Processing│                │ UI │             │ redis-stack ├──┼─────┐
+│  └────▲─────┘                └─▲──┘             └──────▲──────┘  │     │
+│       │                        │                       │         │     │
+│       │                        │                       │         │     │
+│       │                        │                       │         │     │
+│     depends                    │                     depends     │     │
+│       │                        │                       │         │     │
+│       │                        │                       │         │     │
+│       │                      depends                   │         │     │
+│       │                        │                       │         │     │
+│       │                  ┌─────┴─────┐                 │         │     │
+│       └──────────────────┤FraudAverse├─────────────────┘         │     │
+│                          └─┬─────────┘                           │    depends
+│                            │                                     │     │
+│                           depends                                │     │
+└────────────────────────────┬─────────────────────────────────────┘     │
+Bitnami Charts               │                                           │
+┌────────────────────────────┼─────────────────────────────────────┐     │
+│                            │                                     │     │
+│                            │                                     │     │
+│                        ┌───▼───┐              ┌──────┐           │     │
+│                        │MongoDB│              │Redis ◄───────────┼─────┘
+│                        └───────┘              └──────┘           │
+│                                                                  │
+│                                                                  │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+```
