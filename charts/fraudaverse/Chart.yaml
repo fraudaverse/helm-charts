@@ -4,9 +4,9 @@ description: fraudaverse example template for a full installation including proc
 
 type: application
 
-version: 0.7.1
+version: 0.7.2
 
-appVersion: v0.7.1
+appVersion: v0.7.2
 dependencies:
   - name: common
     version: 2.13.2
@@ -18,8 +18,8 @@ dependencies:
     version: 14.0.5
     repository: https://charts.bitnami.com/bitnami
   - name: processing
-    version: 0.7.1
+    version: 0.7.2
     repository: file://../processing
   - name: ui
-    version: 0.7.1
+    version: 0.7.2
     repository: file://../ui
