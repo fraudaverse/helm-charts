@@ -4,7 +4,7 @@ description: fraudaverse example template for a full installation including proc
 
 type: application
 
-version: 0.7.8
+version: 0.7.9
 
 appVersion: v0.7.5
 dependencies:
